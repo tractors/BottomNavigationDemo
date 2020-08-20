@@ -2,6 +2,7 @@ package com.will.bottomnavigationdemo;
 
 import androidx.lifecycle.ViewModelProviders;
 
+import android.animation.ObjectAnimator;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -11,10 +12,12 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 public class SecondFragment extends Fragment {
 
     private SecondViewModel mViewModel;
+    private ImageView imageView;
 
     public static SecondFragment newInstance() {
         return new SecondFragment();
@@ -23,14 +26,33 @@ public class SecondFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.second_fragment, container, false);
+        View view =  inflater.inflate(R.layout.second_fragment, container, false);
+        imageView = view.findViewById(R.id.imageView);
+        return view;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = ViewModelProviders.of(this).get(SecondViewModel.class);
-        // TODO: Use the ViewModel
+        mViewModel = ViewModelProviders.of(requireActivity()).get(SecondViewModel.class);
+        imageView.setScaleX(mViewModel.scaleFactor);
+        imageView.setScaleY(mViewModel.scaleFactor);
+        final ObjectAnimator objectAnimatorX = ObjectAnimator.ofFloat(imageView,"scaleX",0,0);
+        final ObjectAnimator objectAnimatorY = ObjectAnimator.ofFloat(imageView,"scaleY",0,0);
+        objectAnimatorX.setDuration(500);
+        objectAnimatorY.setDuration(500);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (!objectAnimatorX.isRunning()){
+                    objectAnimatorX.setFloatValues(imageView.getScaleX()+0.1f);
+                    objectAnimatorY.setFloatValues(imageView.getScaleY()+0.1f);
+                    mViewModel.scaleFactor +=0.1f;
+                    objectAnimatorX.start();
+                    objectAnimatorY.start();
+                }
+            }
+        });
     }
 
 }
